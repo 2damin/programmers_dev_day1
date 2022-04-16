@@ -61,7 +61,6 @@ class Lenet5(nn.Module):
         x = torch.tanh(x)
         x = self.fc4(x)
         x = x.view(self.batch, -1)
-        x = nn.functional.softmax(x, dim=1)
         if self.is_train is False:
             x = torch.argmax(x, dim=1)
         return x
