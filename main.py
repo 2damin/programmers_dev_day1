@@ -1,4 +1,3 @@
-from turtle import down
 import sys, os
 import argparse
 import torch
@@ -81,7 +80,7 @@ def main():
         device = torch.device("cpu")
     
     #Get MNIST Dataset
-    train_dataset, eval_dataset, test_dataset = get_data(name="FASHION_MNIST")
+    train_dataset, eval_dataset, test_dataset = get_data(name="MNIST")
     
     #Make Dataloader
     train_loader = DataLoader(train_dataset,
@@ -113,12 +112,15 @@ def main():
         model.train()
         
         #optimizer & scheduler
-        optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.1)
+        optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9) #weight_decay=0.1  momentum=0.9
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
         
         criterion = get_criterion(crit='mnist', device=device)
         
-        epoch = 5
+        loss_list = []
+        iter_list = []
+        
+        epoch = 4
         iter = 0
         for e in range(epoch):
             total_loss = 0
@@ -141,7 +143,9 @@ def main():
                 total_loss += loss_val.item()
                 
                 if iter % 100 == 0:
-                    print("{} epoch {} iter loss : {}".format(e, iter, loss_val.item()))   
+                    print("{} epoch {} iter loss : {}".format(e, iter, loss_val.item()))
+                    loss_list += [loss_val.item()]
+                    iter_list += [iter]
                 iter += 1
             
             mean_loss = total_loss / i
@@ -149,6 +153,10 @@ def main():
             
             print("->{} epoch mean loss : {}".format(e, mean_loss))
             torch.save(model.state_dict(), args.output_dir + "/model_epoch"+str(e)+".pt")
+        
+        plt.clf()
+        plt.plot(iter_list, loss_list, 'b', label='loss')
+        plt.savefig('loss.jpg')
         print("Train end")
     elif args.mode == "eval":
         model = _model(batch = 1, n_classes=10, in_channel=1, in_width=32, in_height=32)
