@@ -80,7 +80,7 @@ def main():
         device = torch.device("cpu")
     
     #Get MNIST Dataset
-    train_dataset, eval_dataset, test_dataset = get_data(name="MNIST")
+    train_dataset, eval_dataset, test_dataset = get_data(name="FASHION_MNIST")
     
     #Make Dataloader
     train_loader = DataLoader(train_dataset,
